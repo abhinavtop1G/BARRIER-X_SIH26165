@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:9000
+    depends_on:
+      - gateway
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "9000:9000"
+    environment:
+      - PORT=9000
+      - ML_SERVICE_URL=http://ml-service:8000
+      - AGENT_SERVICE_URL=http://agent-service:8001
+      - MONGODB_URI=mongodb://mongodb:27017
+      - MONGODB_DATABASE=barrierx
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - ml-service
+      - agent-service
+      - mongodb
+
+  ml-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+
+  agent-service:
+    build:
+      context: ./agent_service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - PORT=8001
+      - MONGODB_URI=mongodb://mongodb:27017
+      - MONGODB_DATABASE=barrierx
+      - ML_SERVICE_URL=http://ml-service:8000
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      - ml-service
+      - mongodb
+
+  mongodb:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
