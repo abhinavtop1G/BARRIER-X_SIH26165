@@ -88,11 +88,11 @@ the severity an incident could have reached, assessed by the safety
 professionals who filed it. That is the SIF concept, already labelled by humans.
 `data/build_seed.py` maps levels IV and above to `Yes`.
 
-Two things to state out loud before a judge finds them:
+Two limitations, stated up front:
 
 1. **These are Brazilian mining and metals incidents, not oil and gas.** The
    transfer assumption is that SIF mechanisms and barrier failures are shared
-   across heavy industry. Defensible, but say it first.
+   across heavy industry. We think that is defensible, but it is an assumption.
 2. **411 rows is too few for a confident binary classifier**, and we do not claim
    one. The product is a **ranker**: an HSE reviewer can read roughly 20 reports
    a shift, so what matters is how good the top of that queue is, not accuracy

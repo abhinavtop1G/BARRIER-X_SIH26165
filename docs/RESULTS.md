@@ -129,8 +129,7 @@ mapping over an existing human judgement, not a heuristic over free text.
 Group-aware and stratified; verified zero normalised-narrative overlap across all
 three pairs, and all 411 rows accounted for.
 
-Say this before a judge finds it: **these are Brazilian mining and metals
-incidents, not oil and gas.** The transfer assumption is that SIF mechanisms and
+**These are Brazilian mining and metals incidents, not oil and gas.** The transfer assumption is that SIF mechanisms and
 barrier failures are shared across heavy industry. Defensible, but it is an
 assumption — and §5 is the first measurement in this project that actually tests
 it.
@@ -630,44 +629,3 @@ results meaningful.
 * **int8 is not shipped**, so the deployed artifact is 568 MB and 46 ms/doc rather
   than 172 MB and 30 ms/doc. A saturated model quantises badly; a less confident
   one might not.
-
----
-
-## 10. How to present this
-
-Lead with the constraint, then the failure, then the measurement:
-
-> "There are 411 labelled SIF reports in existence publicly — no dataset publishes
-> SIF-potential labels, and OISD's portal is restricted to operators. That is not
-> enough for a confident classifier and we do not claim one; we built a triage
-> ranker.
->
-> The ranker measured PR-AUC 0.70 and was still useless in deployment: it flagged
-> none of six realistic oil-and-gas severe narratives and scored gibberish above an
-> H2S fatality. Six serving defects, none of which move a ranking metric. We found
-> them, fixed them, and wrote a regression test for each.
->
-> Then we added 395,000 PHMSA hazmat incident reports with real regulatory severity
-> determinations — zero new annotations. In-domain that buys nothing we can prove:
-> +0.02 PR-AUC with a confidence interval that contains zero, and we say so. Out of
-> domain it changes the model completely — every STILT seed separates severe from
-> trivial oil-and-gas narratives perfectly, while every MLM-only seed ranks a string
-> of repeated letters above all of them. Since we train on Brazilian mining and
-> deploy to oil and gas, that is the axis that matters."
-
-Three things this answers before they are asked:
-
-1. *Why not more data?* Because SIF-potential labels do not exist publicly. So we
-   bought signal instead: 590K unlabelled narratives for MLM, 395K regulatory
-   severity determinations for the intermediate task.
-2. *Why not just TF-IDF?* We ran it, including PHMSA-pooled variants. It wins on
-   nothing that matters here and pooling makes it worse.
-3. *Did you use deep learning meaningfully?* We measured a dose-response curve
-   over 0 / 5,000 / 15,000 adaptation steps, ablated the intermediate task four
-   ways, bootstrapped the differences, and reported the ones that were not
-   detectable as not detectable.
-
-Do not claim 100% precision, a "95% accurate model", or that the system replaces
-human review. Do not quote the out-of-domain ROC-AUC of 1.000 without saying it is
-12 hand-written probes. The strength of this result is that every number is
-measured, bounded, and reproducible — including the ones that came out negative.
