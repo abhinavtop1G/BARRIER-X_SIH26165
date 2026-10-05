@@ -1,0 +1,261 @@
+{
+  "source": {
+    "title": "IOGP Life-Saving Rules",
+    "publisher": "International Association of Oil & Gas Producers (IOGP)",
+    "report": "Report 459",
+    "edition": "August 2018 (nine-rule revision)",
+    "url": "https://www.iogp.org/bookstore/product/life-saving-rules/",
+    "licence_note": "Freely published by IOGP for industry-wide adoption. Rule names, actions and commitments are reproduced here for classification purposes with attribution. The report itself is not redistributed in this repository - download it from the URL above.",
+    "transcribed_from": "459.pdf, section 2 'The Life-Saving Rules', Figure 2",
+    "transcription_note": "All 9 rule names and all 9 actions are verbatim, verified programmatically against text extracted from the PDF. 34 of 41 commitments are verbatim; the other 7 are PDF sub-bullets flattened into self-contained lines - e.g. 'I obtain authorisation before: / - deviating from procedures' becomes 'I obtain authorisation before deviating from procedures'. Content is unchanged; only the nesting was removed so each line stands alone for matching.",
+    "why_this_source": "Public, international, and citable. A recommendation traceable to a named rule in a published standard is defensible; invented safety advice is not. OISD standards are the Indian regulatory equivalent but are sold rather than published, so they cannot be redistributed here.",
+    "signals_note": "The `signals` lists are OUR trigger terms for matching narratives to a rule. They are not part of IOGP Report 459 - only `name`, `action` and `commitments` come from the standard. Tune signals freely; never edit the three fields above them."
+  },
+  "usage": {
+    "role": "Grounding for hazard classification and control suggestions only.",
+    "must_not": "These rules do not encode severity. Risk scoring comes from the calibrated SIF model (see docs/RESULTS.md), never from an LLM's reading of these rules.",
+    "audience": "Output is a draft for an HSE reviewer, not an instruction to a worker."
+  },
+  "rules": [
+    {
+      "id": "driving",
+      "name": "Driving",
+      "action": "Follow safe driving rules",
+      "commitments": [
+        "I always wear a seatbelt",
+        "I do not exceed the speed limit, and reduce my speed for road conditions",
+        "I do not use phones or operate devices while driving",
+        "I am fit, rested and fully alert while driving",
+        "I follow journey management"
+      ],
+      "signals": [
+        "vehicle",
+        "driving",
+        "seatbelt",
+        "speed",
+        "journey management",
+        "road",
+        "reversing",
+        "collision",
+        "reverse",
+        "overturned",
+        "rollover"
+      ]
+    },
+    {
+      "id": "bypassing_safety_controls",
+      "name": "Bypassing Safety Controls",
+      "action": "Obtain authorisation before overriding or disabling safety controls",
+      "commitments": [
+        "I understand and use safety-critical equipment and procedures which apply to my task",
+        "I obtain authorisation before disabling or overriding safety equipment",
+        "I obtain authorisation before deviating from procedures",
+        "I obtain authorisation before crossing a barrier"
+      ],
+      "signals": [
+        "override",
+        "bypass",
+        "disabled alarm",
+        "defeated interlock",
+        "crossed barrier",
+        "deviation from procedure",
+        "overrode",
+        "overridden",
+        "bypassed",
+        "interlock",
+        "defeated",
+        "inhibited",
+        "crossed the barrier",
+        "safety control"
+      ]
+    },
+    {
+      "id": "confined_space",
+      "name": "Confined Space",
+      "action": "Obtain authorisation before entering a confined space",
+      "commitments": [
+        "I confirm energy sources are isolated",
+        "I confirm the atmosphere has been tested and is monitored",
+        "I check and use my breathing apparatus when required",
+        "I confirm there is an attendant standing by",
+        "I confirm a rescue plan is in place",
+        "I obtain authorisation to enter"
+      ],
+      "signals": [
+        "confined space",
+        "vessel entry",
+        "tank entry",
+        "gas test",
+        "breathing apparatus",
+        "attendant",
+        "rescue plan",
+        "atmosphere",
+        "manway",
+        "unventilated",
+        "oxygen deficient"
+      ]
+    },
+    {
+      "id": "energy_isolation",
+      "name": "Energy Isolation",
+      "action": "Verify isolation and zero energy before work begins",
+      "commitments": [
+        "I have identified all energy sources",
+        "I confirm that hazardous energy sources have been isolated, locked, and tagged",
+        "I have checked there is zero energy and tested for residual or stored energy"
+      ],
+      "signals": [
+        "isolation",
+        "lockout",
+        "tagout",
+        "LOTO",
+        "stored energy",
+        "residual pressure",
+        "trapped pressure",
+        "de-energised",
+        "live line",
+        "isolated",
+        "energised",
+        "energized",
+        "depressurise",
+        "blinded",
+        "bled down"
+      ]
+    },
+    {
+      "id": "hot_work",
+      "name": "Hot Work",
+      "action": "Control flammables and ignition sources",
+      "commitments": [
+        "I identify and control ignition sources",
+        "Before starting any hot work I confirm flammable material has been removed or isolated",
+        "Before starting any hot work I obtain authorisation",
+        "Before starting hot work in a hazardous area I confirm a gas test has been completed",
+        "Before starting hot work in a hazardous area I confirm gas will be monitored continually"
+      ],
+      "signals": [
+        "hot work",
+        "welding",
+        "grinding",
+        "cutting",
+        "ignition source",
+        "flammable",
+        "spark",
+        "gas test",
+        "LEL",
+        "naked flame",
+        "torch",
+        "burning",
+        "ignition"
+      ]
+    },
+    {
+      "id": "line_of_fire",
+      "name": "Line of Fire",
+      "action": "Keep yourself and others out of the line of fire",
+      "commitments": [
+        "I position myself to avoid moving objects",
+        "I position myself to avoid vehicles",
+        "I position myself to avoid pressure releases",
+        "I position myself to avoid dropped objects",
+        "I establish and obey barriers and exclusion zones",
+        "I take action to secure loose objects and report potential dropped objects"
+      ],
+      "signals": [
+        "struck by",
+        "dropped object",
+        "swinging",
+        "suspended",
+        "pressure release",
+        "stored energy release",
+        "exclusion zone",
+        "under the load",
+        "struck",
+        "whipped",
+        "ejected",
+        "recoiled",
+        "crushed",
+        "pinned",
+        "flying",
+        "stood under",
+        "directly in front",
+        "snapped back"
+      ]
+    },
+    {
+      "id": "safe_mechanical_lifting",
+      "name": "Safe Mechanical Lifting",
+      "action": "Plan lifting operations and control the area",
+      "commitments": [
+        "I confirm that the equipment and load have been inspected and are fit for purpose",
+        "I only operate equipment that I am qualified to use",
+        "I establish and obey barriers and exclusion zones",
+        "I never walk under a suspended load"
+      ],
+      "signals": [
+        "crane",
+        "lift",
+        "sling",
+        "rigging",
+        "hoist",
+        "suspended load",
+        "travelling block",
+        "shackle",
+        "banksman",
+        "load fell",
+        "boom",
+        "winch",
+        "lifting operation"
+      ]
+    },
+    {
+      "id": "work_authorisation",
+      "name": "Work Authorisation",
+      "action": "Work with a valid permit when required",
+      "commitments": [
+        "I have confirmed if a permit is required",
+        "I am authorised to perform the work",
+        "I understand the permit",
+        "I have confirmed that hazards are controlled and it is safe to start",
+        "I stop and reassess if conditions change"
+      ],
+      "signals": [
+        "permit to work",
+        "PTW",
+        "no permit",
+        "unauthorised",
+        "toolbox talk",
+        "risk assessment",
+        "conditions changed",
+        "without a permit",
+        "permit had not",
+        "authorisation"
+      ]
+    },
+    {
+      "id": "working_at_height",
+      "name": "Working at Height",
+      "action": "Protect yourself against a fall when working at height",
+      "commitments": [
+        "I inspect my fall protection equipment before use",
+        "I secure tools and work materials to prevent dropped objects",
+        "I tie off 100% to approved anchor points while outside a protected area"
+      ],
+      "signals": [
+        "height",
+        "scaffold",
+        "ladder",
+        "fall arrest",
+        "harness",
+        "anchor point",
+        "platform",
+        "edge",
+        "metres above",
+        "fell from",
+        "clipped on",
+        "tied off",
+        "guardrail"
+      ]
+    }
+  ]
+}
