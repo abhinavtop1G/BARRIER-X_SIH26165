@@ -45,6 +45,9 @@ type ScoreResponsePayload struct {
 func main() {
 	cfg := config.Load()
 	auth.SetSigningSecret(cfg.JWTSecret)
+	if cfg.DemoMode {
+		log.Printf("[Auth] DEMO_MODE is on: /api/v1/auth/demo issues sessions without Google sign-in. Turn it off outside evaluation.")
+	}
 	revProxy := proxy.NewReverseProxy()
 	repo := mongodb.NewRepository(cfg.MongoDBURI, cfg.MongoDBDatabase)
 
@@ -64,6 +67,7 @@ func main() {
 			"version":        "1.0.0",
 			"ml_status":      mlStatus,
 			"ml":             mlHealth,
+			"demo_login":     cfg.DemoMode,
 		}
 		if mlErr != "" {
 			body["ml_error"] = mlErr
@@ -108,6 +112,27 @@ func main() {
 		token, claims := auth.IssueSessionToken(googleInfo)
 
 		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status": "authenticated",
+			"token":  token,
+			"user":   claims,
+		})
+	})
+
+	mux.HandleFunc("/api/v1/auth/demo", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		if !cfg.DemoMode {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]string{"error": "demo login is disabled"})
+			return
+		}
+
+		token, claims := auth.IssueDemoSessionToken()
+		log.Printf("[Auth] demo session issued to %s", r.RemoteAddr)
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"status": "authenticated",
 			"token":  token,

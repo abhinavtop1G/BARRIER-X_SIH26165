@@ -106,6 +106,23 @@ func VerifyGoogleIDToken(idToken string, expectedAudience string) (*GoogleTokenI
 	return &info, nil
 }
 
+func IssueDemoSessionToken() (string, *UserClaims) {
+	claims := &UserClaims{
+		UserID:    "usr_demo",
+		Email:     "demo@barrierx.local",
+		Name:      "Demo Judge",
+		Role:      "demo",
+		ExpiresAt: time.Now().Add(8 * time.Hour),
+	}
+	return signClaims(claims), claims
+}
+
+func signClaims(claims *UserClaims) string {
+	claimsJSON, _ := json.Marshal(claims)
+	payload := base64.RawURLEncoding.EncodeToString(claimsJSON)
+	return fmt.Sprintf("bx_session_%s.%s", payload, signPayload(payload))
+}
+
 func IssueSessionToken(info *GoogleTokenInfo) (string, *UserClaims) {
 	userName := info.Name
 	if userName == "" {
@@ -121,11 +138,7 @@ func IssueSessionToken(info *GoogleTokenInfo) (string, *UserClaims) {
 		ExpiresAt: time.Now().Add(24 * time.Hour),
 	}
 
-	claimsJSON, _ := json.Marshal(claims)
-	payload := base64.RawURLEncoding.EncodeToString(claimsJSON)
-	tokenStr := fmt.Sprintf("bx_session_%s.%s", payload, signPayload(payload))
-
-	return tokenStr, claims
+	return signClaims(claims), claims
 }
 
 func ValidateToken(tokenStr string) (*UserClaims, error) {

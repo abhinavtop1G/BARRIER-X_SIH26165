@@ -13,6 +13,7 @@ type Config struct {
 	MongoDBURI      string
 	MongoDBDatabase string
 	GoogleClientID  string
+	DemoMode        bool
 }
 
 func loadDotEnv(paths ...string) {
@@ -77,6 +78,9 @@ func Load() *Config {
 
 	googleClientID := os.Getenv("GOOGLE_CLIENT_ID")
 
+	demo := strings.ToLower(strings.TrimSpace(os.Getenv("DEMO_MODE")))
+	demoMode := demo == "1" || demo == "true" || demo == "yes"
+
 	return &Config{
 		Port:            port,
 		MLServiceURL:    mlURL,
@@ -85,5 +89,6 @@ func Load() *Config {
 		MongoDBURI:      mongoURI,
 		MongoDBDatabase: mongoDB,
 		GoogleClientID:  googleClientID,
+		DemoMode:        demoMode,
 	}
 }
