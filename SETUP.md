@@ -76,13 +76,13 @@ most often get wrong:
   [aistudio.google.com](https://aistudio.google.com), takes two minutes. Without
   it the agent still answers, but from a canned fallback rather than a model.
 
-`frontend/.env` — **`VITE_GOOGLE_CLIENT_ID` is required**, the same value as
-`GOOGLE_CLIENT_ID` in `.env`. There is no demo bypass; with it empty there is no
-way to sign in.
+`frontend/.env` — `VITE_GOOGLE_CLIENT_ID` enables Google sign-in and takes the
+same value as `GOOGLE_CLIENT_ID` in `.env`. Without it, set `DEMO_MODE=true` for
+the gateway and use the demo login on the sign-in page.
 
-The client ID is public by design and safe to share. The Atlas URI and the LLM
-keys are not — send those through a password manager, never chat. There is no
-`GOOGLE_CLIENT_SECRET`: nothing reads one.
+The client ID is public by design. The Atlas URI and the LLM keys are secrets:
+keep them in `.env`, which is gitignored, and out of version control. There is
+no `GOOGLE_CLIENT_SECRET`: nothing reads one.
 
 ---
 
@@ -180,20 +180,3 @@ or 3.12.
 **Port 5173 in use.** Vite will take 5174 and print it — but `vite.config.ts`
 only proxies `/api` from the port it is actually serving, so use the URL it
 prints rather than assuming 5173.
-
----
-
-## Notes for a demo
-
-The scoring model ranks reports; it does not classify them reliably in absolute
-terms. On the bundled demo dataset the H2S report lands around rank 15 and the
-confined-space entry around 25, while a perimeter-lighting observation reaches
-rank 5. That is documented out-of-domain behaviour — `docs/RESULTS.md` §5f — and
-the honest framing is that the ranking transfers and the absolute threshold does
-not.
-
-The demo dataset is deliberately hazard-rich, so the SIF-potential percentage on
-the Overview card runs far above the "under 20% of incidents carry SIF
-potential" figure in the pitch. That is a property of the sample, not the model.
-
-Agent replies take roughly 6-11 seconds. A spinner shows throughout.
