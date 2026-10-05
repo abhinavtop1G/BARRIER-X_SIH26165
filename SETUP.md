@@ -99,8 +99,9 @@ Compose reads these from a `.env` file next to `docker-compose.yml`:
 
 | variable | used by | notes |
 |---|---|---|
-| `GOOGLE_CLIENT_ID` | frontend (build time), gateway | required for sign-in |
+| `GOOGLE_CLIENT_ID` | frontend (build time), gateway | needed for Google sign-in; optional while demo mode is on |
 | `JWT_SECRET` | gateway | if unset, a random key is generated and sessions reset on restart |
+| `DEMO_MODE` | gateway | defaults to `true` in compose: the login page offers **Continue as demo judge**, so no Google account is needed. Set `DEMO_MODE=false` for real deployments |
 | `GEMINI_API_KEY` / `GROQ_API_KEY` / `OPENAI_API_KEY` | agent | optional; the agent falls back to built-in HSE answers without them |
 
 The frontend is a static build served by nginx. `VITE_*` values are baked in at

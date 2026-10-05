@@ -25,6 +25,7 @@ services:
       - MONGODB_DATABASE=barrierx
       - JWT_SECRET=${JWT_SECRET}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - DEMO_MODE=${DEMO_MODE:-true}
     depends_on:
       - ml-service
       - agent-service
