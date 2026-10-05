@@ -1,0 +1,25 @@
+{
+  "method": "platt",
+  "params": {
+    "a": 0.3069397063922895,
+    "b": -0.507934853567831
+  },
+  "fitted_on": {
+    "n": 57,
+    "base_rate": 0.4035,
+    "raw_range": [
+      0.025,
+      0.8732
+    ],
+    "raw_log_loss": 0.7986,
+    "raw_brier": 0.2769,
+    "raw_ece": 0.2654,
+    "cal_log_loss": 0.6587,
+    "cal_brier": 0.2312,
+    "cal_ece": 0.0912,
+    "considered": {
+      "identity": 0.7986,
+      "platt": 0.6587
+    }
+  }
+}
