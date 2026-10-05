@@ -27,16 +27,18 @@ export interface BatchScoreResponse {
 }
 
 export interface HealthResponse {
-  status:              'ok' | 'degraded'
-  model_backend:       string
-  model:               string
-  model_fingerprint:   string
-  calibration:         string
-  default_threshold:   number
-  band_margin:         number
-  model_ready:         boolean
-  auth_enabled:        boolean
-  rate_limit_per_min:  number
+  status:              'ok' | 'degraded' | 'down'
+  gateway_service:     string | null
+  gateway_version:     string | null
+  model_backend:       string | null
+  model:               string | null
+  model_fingerprint:   string | null
+  calibration:         string | null
+  default_threshold:   number | null
+  band_margin:         number | null
+  model_ready:         boolean | null
+  auth_enabled:        boolean | null
+  rate_limit_per_min:  number | null
 }
 
 export type RiskBand = 'HIGH' | 'ELEVATED' | 'BORDERLINE' | 'LOW'

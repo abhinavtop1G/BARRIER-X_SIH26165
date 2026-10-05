@@ -109,33 +109,33 @@ export const sendAgentMessage = async (message: string, conversationId = 'defaul
   }
 }
 
+const UNKNOWN_MODEL = {
+  model_backend: null,
+  model: null,
+  model_fingerprint: null,
+  calibration: null,
+  default_threshold: null,
+  band_margin: null,
+  model_ready: null,
+  auth_enabled: null,
+  rate_limit_per_min: null,
+} as const
+
 export const getHealth = async (): Promise<HealthResponse> => {
   try {
-    const data = await request<{ gateway_status: string }>('/health')
+    const data = await request<{ gateway_status?: string; service?: string; version?: string }>('/health')
     return {
       status: data.gateway_status === 'ok' ? 'ok' : 'degraded',
-      model_backend: 'onnx-runtime-cpu',
-      model: 'deberta-v3-small-sif',
-      model_fingerprint: 'a7f3c9e1208b49e2',
-      calibration: 'platt',
-      default_threshold: 0.5,
-      band_margin: 0.15,
-      model_ready: true,
-      auth_enabled: true,
-      rate_limit_per_min: 600,
+      gateway_service: data.service ?? null,
+      gateway_version: data.version ?? null,
+      ...UNKNOWN_MODEL,
     }
   } catch {
     return {
-      status: 'ok',
-      model_backend: 'onnx-runtime-cpu',
-      model: 'deberta-v3-small-sif',
-      model_fingerprint: 'a7f3c9e1208b49e2',
-      calibration: 'platt',
-      default_threshold: 0.5,
-      band_margin: 0.15,
-      model_ready: true,
-      auth_enabled: true,
-      rate_limit_per_min: 600,
+      status: 'down',
+      gateway_service: null,
+      gateway_version: null,
+      ...UNKNOWN_MODEL,
     }
   }
 }
