@@ -1,0 +1,549 @@
+<!doctype html>
+
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="darkreader-lock">
+<title>BARRIER X — SIF Risk</title>
+<style>
+  :root {
+    color-scheme: light dark;
+
+    --bg: #f4f5f7;  --panel: #ffffff;  --panel-2: #fafbfc;
+    --ink: #16191d;  --ink-2: #545c66;  --ink-3: #8b949e;
+    --line: #dfe3e8;  --line-2: #eceff2;
+    --accent: #1f5fa9;  --accent-ink: #ffffff;
+    --critical: #b3231f;  --high: #c25400;  --watch: #8a6100;  --normal: #4a7c59;
+    --critical-bg: #fdeceb;  --high-bg: #fdf0e6;  --watch-bg: #fbf5e3; --normal-bg: #edf5ef;
+    --warn-bg: #fff8e1;  --warn-line: #e6cf88;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171a;  --panel: #1c2024;  --panel-2: #22272c;
+      --ink: #e6e9ec;  --ink-2: #a8b0b8;  --ink-3: #79828c;
+      --line: #2e343a;  --line-2: #262b30;
+      --accent: #5a9bd8;  --accent-ink: #0d1013;
+      --critical: #ef7b76;  --high: #e69a5c;  --watch: #d4b355;  --normal: #7fb98e;
+      --critical-bg: #3a1f1e;  --high-bg: #35281c;  --watch-bg: #322d1c; --normal-bg: #1f2c23;
+      --warn-bg: #2e2818;  --warn-line: #5c5030;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  a { color: var(--accent); }
+
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--panel); border-bottom: 1px solid var(--line);
+    padding: 10px 16px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .brand { font-weight: 650; letter-spacing: -0.01em; font-size: 15px; }
+  .brand span { color: var(--ink-3); font-weight: 400; margin-left: 8px; font-size: 13px; }
+  .spacer { flex: 1 1 auto; }
+  .pill {
+    font-size: 12px; padding: 2px 9px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--panel-2); color: var(--ink-2);
+    white-space: nowrap;
+  }
+  .pill.bad { color: var(--critical); border-color: var(--critical); background: var(--critical-bg); }
+  .pill.good { color: var(--normal); border-color: var(--normal); background: var(--normal-bg); }
+  .pill code { font-family: var(--mono); font-size: 11px; }
+  header button, header input[type="password"] {
+    padding: 5px 10px; border: 1px solid var(--line);
+    border-radius: 6px; background: var(--panel-2);
+  }
+  header button:hover { border-color: var(--accent); }
+  header input[type="password"] { width: 150px; }
+  header label.stamp { display: inline-flex; align-items: center; gap: 5px; }
+  .stamp { font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+  .caveat {
+    background: var(--warn-bg); border-bottom: 1px solid var(--warn-line);
+    padding: 7px 16px; font-size: 12.5px; color: var(--ink-2);
+  }
+  .caveat b { color: var(--ink); }
+
+  main { display: grid; grid-template-columns: minmax(300px, 380px) 1fr; gap: 14px; padding: 14px; align-items: start; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 9px; }
+  .panel > h2 {
+    margin: 0; padding: 11px 14px; font-size: 12px; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--ink-3); border-bottom: 1px solid var(--line-2);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .panel > h2 .count { color: var(--ink-2); text-transform: none; letter-spacing: 0; font-size: 12px; }
+
+  #alerts { margin: 0 14px; }
+  .alert {
+    border: 1px solid var(--critical); background: var(--critical-bg);
+    border-radius: 9px; padding: 11px 14px; margin-bottom: 10px; cursor: pointer;
+  }
+  .alert:hover { filter: brightness(0.98); }
+  .alert h3 { margin: 0 0 3px; font-size: 14px; color: var(--critical); }
+  .alert p { margin: 0; font-size: 13px; color: var(--ink-2); }
+
+  .row {
+    display: block; width: 100%; text-align: left; padding: 11px 14px;
+    border: 0; border-bottom: 1px solid var(--line-2); background: none;
+  }
+  .row:hover { background: var(--panel-2); }
+  .row[aria-current="true"] { background: var(--panel-2); box-shadow: inset 3px 0 0 var(--accent); }
+  .row-top { display: flex; align-items: baseline; gap: 8px; }
+  .risk { font-family: var(--mono); font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .site-id { font-weight: 550; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row-meta { font-size: 12px; color: var(--ink-3); margin-top: 3px; }
+  .hazards { font-size: 12px; color: var(--ink-2); margin-top: 5px; }
+
+  .chip {
+    font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 4px;
+    letter-spacing: 0.03em; white-space: nowrap;
+  }
+  .lv-CRITICAL, .bd-HIGH { color: var(--critical); background: var(--critical-bg); }
+  .lv-HIGH, .bd-ELEVATED { color: var(--high); background: var(--high-bg); }
+  .lv-WATCH, .bd-BORDERLINE { color: var(--watch); background: var(--watch-bg); }
+  .lv-NORMAL, .bd-LOW { color: var(--normal); background: var(--normal-bg); }
+  .compounding { color: var(--critical); background: var(--critical-bg); border: 1px solid var(--critical); }
+
+  .tabs { display: flex; gap: 2px; padding: 8px 10px 0; border-bottom: 1px solid var(--line-2); }
+  .tabs button {
+    padding: 7px 13px; border: 0; background: none; color: var(--ink-2);
+    border-bottom: 2px solid transparent; font-size: 13px;
+  }
+  .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 550; }
+
+  .body { padding: 14px; }
+  .muted { color: var(--ink-3); }
+  .explanation {
+    font-family: var(--mono); font-size: 12.5px; line-height: 1.65; white-space: pre-wrap;
+    background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 7px;
+    padding: 12px; overflow-x: auto;
+  }
+  .stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+  .stat { border: 1px solid var(--line-2); border-radius: 7px; padding: 8px 12px; min-width: 108px; background: var(--panel-2); }
+  .stat dt { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat dd { margin: 2px 0 0; font-family: var(--mono); font-size: 15px; font-variant-numeric: tabular-nums; }
+
+  details.cluster { border: 1px solid var(--line-2); border-radius: 7px; margin-bottom: 8px; background: var(--panel-2); }
+  details.cluster > summary { padding: 10px 12px; cursor: pointer; display: flex; align-items: baseline; gap: 9px; }
+  details.cluster > summary::-webkit-details-marker { display: none; }
+  details.cluster > summary::before { content: "▸"; color: var(--ink-3); }
+  details.cluster[open] > summary::before { content: "▾"; }
+  .cluster-body { padding: 0 12px 12px 12px; border-top: 1px solid var(--line-2); }
+  .member { border-left: 2px solid var(--line); padding: 8px 0 8px 11px; margin-top: 10px; }
+  .member-head { font-size: 12px; color: var(--ink-3); display: flex; gap: 9px; align-items: baseline; }
+  .narrative { margin: 4px 0 0; }
+
+  .rule { border: 1px solid var(--line-2); border-radius: 7px; padding: 10px 12px; margin-top: 9px; background: var(--panel-2); }
+  .rule h4 { margin: 0 0 4px; font-size: 13.5px; }
+  .evidence { font-size: 12px; color: var(--ink-2); }
+  .evidence code {
+    font-family: var(--mono); background: var(--line-2); padding: 1px 5px;
+    border-radius: 3px; margin-right: 4px; display: inline-block;
+  }
+  .rule ul { margin: 7px 0 0; padding-left: 18px; font-size: 13px; color: var(--ink-2); }
+  .rule li { margin: 2px 0; }
+  .source { font-size: 11px; color: var(--ink-3); margin-top: 7px; }
+
+  textarea {
+    width: 100%; min-height: 110px; padding: 10px; border: 1px solid var(--line);
+    border-radius: 7px; background: var(--panel-2); resize: vertical;
+  }
+  .form-row { display: flex; gap: 9px; margin-top: 9px; flex-wrap: wrap; }
+  .form-row input { flex: 1 1 180px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2); }
+  .primary { background: var(--accent); color: var(--accent-ink); border: 1px solid var(--accent); border-radius: 6px; padding: 7px 16px; font-weight: 550; }
+  .primary[disabled] { opacity: 0.55; cursor: default; }
+
+  .notice { border: 1px solid var(--warn-line); background: var(--warn-bg); border-radius: 7px; padding: 11px 13px; font-size: 13px; }
+  .notice.error { border-color: var(--critical); background: var(--critical-bg); color: var(--critical); }
+  table.params { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 4px; }
+  table.params td { padding: 3px 8px 3px 0; border-bottom: 1px solid var(--line-2); }
+  table.params td:last-child { font-family: var(--mono); text-align: right; color: var(--ink-2); }
+  footer { padding: 8px 16px 24px; font-size: 12px; color: var(--ink-3); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">BARRIER X <span>SIF risk — safety officer workspace</span></div>
+  <span class="spacer"></span>
+  <span id="health-pills"></span>
+  <input id="apikey" type="password" placeholder="API key" autocomplete="off" hidden>
+  <label class="stamp"><input type="checkbox" id="auto" checked> auto</label>
+  <button id="refresh">Refresh</button>
+  <span class="stamp" id="stamp">—</span>
+</header>
+
+<div class="caveat">
+  <b>Read the evidence, not the number.</b>
+  Per-report scores are a <b>ranker</b> trained on 231 labelled rows, not a verdict.
+  Site risk is an <b>unvalidated aggregation policy</b> — no test set, no PR-AUC — that assumes
+  hazards at a site are independent when they are not, and it inherits and amplifies the model's
+  out-of-domain errors. This triages reports for human review; it does not replace human judgement.
+</div>
+
+<div id="alerts" hidden></div>
+
+<main>
+  <section class="panel">
+    <h2>Site queue <span class="count" id="queue-count"></span></h2>
+    <div id="queue"><div class="body muted">Loading…</div></div>
+  </section>
+
+  <section class="panel">
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tab-site" aria-selected="true">Site detail</button>
+      <button role="tab" id="tab-score" aria-selected="false">Score a report</button>
+    </div>
+    <div id="pane-site" class="body"><p class="muted">Select a site from the queue.</p></div>
+    <div id="pane-score" class="body" hidden>
+      <p class="muted">Score a narrative. If you give it a site, it joins that site's history
+        and will show up in the queue on the next refresh.</p>
+      <textarea id="narrative" placeholder="Paste an incident or near-miss narrative…"></textarea>
+      <div class="form-row">
+        <input id="score-site" placeholder="site id (optional)">
+        <label class="stamp" style="display:inline-flex;align-items:center;gap:5px"
+               title="Transliterate Devanagari/Assamese, expand oilfield abbreviations, map romanised Hindi/Assamese to English, repair domain typos. Every substitution is shown.">
+          <input type="checkbox" id="do-normalise"> normalise first
+        </label>
+        <button class="primary" id="do-score">Score</button>
+      </div>
+      <div id="score-out"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Served by this API process. <a href="/docs">OpenAPI docs</a> ·
+  <a href="/health">/health</a>
+</footer>
+
+<script>
+"use strict";
+
+const REFRESH_MS = 15000;
+const $ = (id) => document.getElementById(id);
+const state = { sites: [], selected: null, health: null, tab: "site", timer: null };
+
+const keyStore = {
+  get() { try { return sessionStorage.getItem("avertx_key") || ""; } catch { return ""; } },
+  set(v) { try { sessionStorage.setItem("avertx_key", v); } catch {} },
+};
+
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => (
+  { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pct = (n) => Number(n).toFixed(2);
+const signed = (n) => (n >= 0 ? "+" : "") + Number(n).toFixed(2);
+
+function ago(iso) {
+  const days = (Date.now() - new Date(iso).getTime()) / 86400000;
+  if (days < 1) return "today";
+  if (days < 2) return "yesterday";
+  return Math.round(days) + "d ago";
+}
+
+const TREND = { rising: "▲ rising", falling: "▼ falling", steady: "→ steady" };
+const trendShort = (t) => TREND[t] || "";
+const trendLong = (t) => TREND[t] || "not enough history";
+
+async function api(path, options) {
+  const headers = { "Content-Type": "application/json" };
+  const key = keyStore.get();
+  if (key) headers["X-API-Key"] = key;
+  const res = await fetch(path, Object.assign({ headers }, options || {}));
+  if (res.status === 401) {
+    $("apikey").hidden = false;
+    $("apikey").focus();
+    throw new Error("This service needs an API key. Enter one above.");
+  }
+  if (!res.ok) {
+    let detail = res.statusText;
+    try { detail = (await res.json()).detail || detail; } catch {}
+    const err = new Error(detail);
+    err.status = res.status;
+    throw err;
+  }
+  return res.json();
+}
+
+function renderHealth(h) {
+  const pills = [];
+  pills.push(h.model_ready
+    ? `<span class="pill good">model ready</span>`
+    : `<span class="pill bad">model ${esc(h.model_backend)}</span>`);
+  pills.push(h.store_enabled
+    ? `<span class="pill good">history on</span>`
+    : `<span class="pill bad" title="${esc(h.store_status)}">history off</span>`);
+  pills.push(`<span class="pill">threshold <code>${pct(h.default_threshold)}</code></span>`);
+  pills.push(`<span class="pill" title="content hash of the served weights">model <code>${esc(h.model_fingerprint)}</code></span>`);
+  if (!h.auth_enabled) pills.push(`<span class="pill bad" title="Anyone who can reach this service can score. Set SIF_API_KEYS.">unauthenticated</span>`);
+  $("health-pills").innerHTML = pills.join(" ");
+}
+
+function renderQueue() {
+  const sites = state.sites;
+  $("queue-count").textContent = sites.length ? `${sites.length} site${sites.length > 1 ? "s" : ""}` : "";
+
+  if (!sites.length) {
+    $("queue").innerHTML = `<div class="body muted">No reports in the window.
+      Score one with a site id to start a history.</div>`;
+    return;
+  }
+  $("queue").innerHTML = sites.map((s) => `
+    <button class="row" data-site="${esc(s.site_id)}" aria-current="${s.site_id === state.selected}">
+      <div class="row-top">
+        <span class="risk lv-${s.level}" style="background:none">${pct(s.site_risk)}</span>
+        <span class="chip lv-${s.level}">${s.level}</span>
+        ${s.compounding ? '<span class="chip compounding">COMPOUNDING</span>' : ""}
+        <span class="spacer"></span>
+      </div>
+      <div class="site-id">${esc(s.site_id)}</div>
+      <div class="row-meta">
+        ${s.n_observations} report${s.n_observations === 1 ? "" : "s"} ·
+        ${s.n_clusters} hazard group${s.n_clusters === 1 ? "" : "s"} ·
+        worst single ${pct(s.max_report_probability)}${trendShort(s.trend) ? " · " + trendShort(s.trend) : ""}
+      </div>
+      <div class="hazards">${s.top_hazards.map(esc).join(" · ") || "&nbsp;"}</div>
+    </button>`).join("");
+
+  for (const el of $("queue").querySelectorAll(".row")) {
+    el.onclick = () => selectSite(el.dataset.site);
+  }
+}
+
+function renderAlerts() {
+  const alerting = state.sites.filter((s) => s.compounding);
+  const box = $("alerts");
+  box.hidden = !alerting.length;
+  box.innerHTML = alerting.map((s) => `
+    <div class="alert" data-site="${esc(s.site_id)}">
+      <h3>${esc(s.site_id)} — compounding risk (${pct(s.site_risk)})</h3>
+      <p>${s.n_clusters} hazard groups are live at once. No single report reached the
+         review threshold — the worst was ${pct(s.max_report_probability)} — so per-report
+         triage would not have surfaced this site. ${esc(s.top_hazards.join(" · "))}</p>
+    </div>`).join("");
+  for (const el of box.querySelectorAll(".alert")) {
+    el.onclick = () => selectSite(el.dataset.site);
+  }
+}
+
+function renderSite(d) {
+  const stat = (label, value, title) =>
+    `<div class="stat" ${title ? `title="${esc(title)}"` : ""}><dt>${label}</dt><dd>${value}</dd></div>`;
+
+  const head = `
+    <h3 style="margin:0 0 4px">${esc(d.site_id)}
+      <span class="chip lv-${d.level}">${d.level}</span>
+      ${d.compounding ? '<span class="chip compounding">COMPOUNDING</span>' : ""}
+    </h3>
+    <p class="muted" style="margin:0">${esc(d.guidance)}</p>
+    <dl class="stats">
+      ${stat("Site risk", pct(d.site_risk), "Combined across hazard groups by noisy-OR. Not a calibrated probability.")}
+      ${stat("Worst report", pct(d.max_report_probability), "The highest single score. This is what per-report triage would have shown.")}
+      ${stat("Escalation", signed(d.escalation), "How much the accumulation adds over the worst single report.")}
+      ${stat("Reports", d.n_observations)}
+      ${stat("Groups", d.n_clusters)}
+      ${stat("Trend", trendLong(d.trend), "Recent half of the window against the prior half. Needs reports in both halves.")}
+    </dl>`;
+
+  const clusters = d.clusters.map((c) => `
+    <details class="cluster" ${c.strength >= 0.25 ? "open" : ""}>
+      <summary>
+        <span class="risk" title="What this hazard contributes to the site score: the strongest report after time decay, plus any recurrence bonus. Member scores below are as originally scored, undecayed.">${pct(c.strength)}</span>
+        <strong>${esc(c.label)}</strong>
+        <span class="muted" style="font-size:12px">
+          ${c.size} report${c.size === 1 ? "" : "s"} · latest ${ago(c.latest)}
+          ${c.recurrence_bonus > 0.001
+            ? ` · recurrence ×${c.effective_count.toFixed(1)} added ${signed(c.recurrence_bonus)}`
+            : ""}
+        </span>
+      </summary>
+      <div class="cluster-body">
+        ${c.members.map((m) => `
+          <div class="member">
+            <div class="member-head">
+              <span class="risk">${pct(m.sif_probability)}</span>
+              <span>${ago(m.timestamp)}</span>
+              <span>${m.rules.map(esc).join(", ") || "no rule matched"}</span>
+              <span class="muted" style="font-family:var(--mono)">${esc(m.obs_id)}</span>
+            </div>
+            <p class="narrative">${esc(m.narrative) || '<span class="muted">text not stored (SIF_STORE_TEXT=0)</span>'}</p>
+          </div>`).join("")}
+      </div>
+    </details>`).join("");
+
+  const params = Object.entries(d.params).map(([k, v]) =>
+    `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("");
+
+  $("pane-site").innerHTML = `
+    ${head}
+    <h4 style="margin:16px 0 6px">Why this site scores as it does</h4>
+    <div class="explanation">${esc(d.explanation)}</div>
+    <h4 style="margin:18px 0 8px">Hazard groups and the reports behind them</h4>
+    ${clusters}
+    <details style="margin-top:14px">
+      <summary class="muted" style="cursor:pointer">Assessment parameters</summary>
+      <p class="muted" style="font-size:12.5px;margin:8px 0 0">
+        These are policy, not fitted values, and they are tunable at runtime — an
+        assessment cannot be re-derived without them.</p>
+      <table class="params">${params}</table>
+    </details>
+    <p class="muted" style="font-size:12px;margin-top:14px">${esc(d.caveat)}</p>`;
+}
+
+async function selectSite(siteId) {
+  state.selected = siteId;
+  showTab("site");
+  renderQueue();
+  $("pane-site").innerHTML = '<p class="muted">Loading…</p>';
+  try {
+    renderSite(await api(`/sites/${encodeURIComponent(siteId)}`));
+  } catch (err) {
+    $("pane-site").innerHTML = `<div class="notice error">${esc(err.message)}</div>`;
+  }
+}
+
+function renderNormalisation(n) {
+  if (!n) return "";
+  return `<details class="cluster" style="margin-top:12px">
+    <summary><strong>Normalised before scoring</strong>
+      <span class="muted" style="font-size:12px">${n.changes.length} substitution${
+        n.changes.length === 1 ? "" : "s"}${
+        n.scripts.length ? " · " + n.scripts.map(esc).join(", ") : ""}</span></summary>
+    <div class="cluster-body">
+      <div class="member"><div class="member-head">as written</div>
+        <p class="narrative">${esc(n.original)}</p></div>
+      <div class="member"><div class="member-head">what the model read</div>
+        <p class="narrative">${esc(n.text)}</p></div>
+      <ul style="margin:10px 0 0;padding-left:18px;font-size:12.5px">
+        ${n.changes.map((c) => `<li><span class="muted">${esc(c.step)}</span>
+          <code>${esc(c.before)}</code> &rarr; <code>${esc(c.after)}</code></li>`).join("")}
+      </ul>
+    </div></details>`;
+}
+
+function lowScoreButRuleMatched(r) {
+  if (!r.rules || !r.rules.length) return "";
+  if (r.band !== "LOW" && r.band !== "BORDERLINE") return "";
+  const n = r.rules.length;
+  return `<div class="notice"><b>The score and the rule match disagree.</b>
+    The model puts this below the review threshold, but the wording matches
+    ${n} Life-Saving Rule${n > 1 ? "s" : ""}. These are independent signals — the
+    model's absolute threshold is known not to transfer to out-of-domain
+    narratives, so a low score is not a clearance. Read the checks below.</div>`;
+}
+
+function renderRules(rules) {
+  if (!rules || !rules.length) {
+    return `<div class="notice" style="margin-top:12px">No Life-Saving Rule matched this wording.
+      <b>That is not a safety judgement</b> — the risk score above is independent of it.</div>`;
+  }
+  return rules.map((r) => `
+    <div class="rule">
+      <h4>${esc(r.rule_name)} <span class="muted" style="font-weight:400">— ${esc(r.action)}</span></h4>
+      <div class="evidence">matched on ${r.evidence.map((e) => `<code>${esc(e)}</code>`).join("")}</div>
+      <ul>${r.suggested_checks.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>
+      <div class="source">${esc(r.source)} · wording similarity ${pct(r.confidence)},
+        which is not a risk level</div>
+    </div>`).join("");
+}
+
+async function doScore() {
+  const text = $("narrative").value.trim();
+  const site = $("score-site").value.trim();
+  const out = $("score-out");
+  if (text.length < 10) {
+    out.innerHTML = `<div class="notice error" style="margin-top:12px">A narrative needs at least 10 characters.</div>`;
+    return;
+  }
+  $("do-score").disabled = true;
+  out.innerHTML = `<p class="muted" style="margin-top:12px">Scoring…</p>`;
+  try {
+    const body = { narrative: text, normalise: $("do-normalise").checked };
+    if (site) body.site_id = site;
+    const r = await api("/score", { method: "POST", body: JSON.stringify(body) });
+    out.innerHTML = `
+      <dl class="stats" style="margin-top:14px">
+        <div class="stat"><dt>SIF probability</dt><dd>${pct(r.sif_probability)}</dd></div>
+        <div class="stat"><dt>Threshold</dt><dd>${pct(r.threshold)}</dd></div>
+        <div class="stat"><dt>Band</dt><dd><span class="chip bd-${r.band}">${r.band}</span></dd></div>
+      </dl>
+      <p>${esc(r.guidance)}</p>
+      ${renderNormalisation(r.normalisation)}
+      ${lowScoreButRuleMatched(r)}
+      ${site ? (r.recorded
+        ? `<div class="notice">Recorded against <b>${esc(r.site_id)}</b> as
+             <code>${esc(r.obs_id)}</code>. It will appear in that site's assessment.</div>`
+        : `<div class="notice error">Scored, but <b>not recorded</b> — the observation store is
+             unavailable. The score above is still valid; /health says why.</div>`) : ""}
+      <h4 style="margin:16px 0 0">What a reviewer should check</h4>
+      ${renderRules(r.rules)}
+      <p class="muted" style="font-size:12px;margin-top:14px">
+        Scored by <code>${esc(r.model)}</code> (${esc(r.calibration)} calibration,
+        weights <code>${esc(r.model_fingerprint)}</code>).</p>`;
+    if (site) refresh();
+  } catch (err) {
+    out.innerHTML = `<div class="notice error" style="margin-top:12px">${esc(err.message)}</div>`;
+  } finally {
+    $("do-score").disabled = false;
+  }
+}
+
+function showTab(which) {
+  state.tab = which;
+  $("tab-site").setAttribute("aria-selected", which === "site");
+  $("tab-score").setAttribute("aria-selected", which === "score");
+  $("pane-site").hidden = which !== "site";
+  $("pane-score").hidden = which !== "score";
+}
+
+async function refresh() {
+  try {
+    state.health = await api("/health");
+    renderHealth(state.health);
+    if (state.health.auth_enabled) $("apikey").hidden = false;
+  } catch {}
+
+  try {
+    const data = await api("/sites");
+    state.sites = data.sites;
+    renderQueue();
+    renderAlerts();
+    $("stamp").textContent = `updated ${new Date().toLocaleTimeString()} · polls every ${REFRESH_MS / 1000}s`;
+  } catch (err) {
+    $("queue").innerHTML = `<div class="body"><div class="notice ${err.status === 503 ? "" : "error"}">
+      ${esc(err.message)}</div></div>`;
+    $("queue-count").textContent = "";
+    $("alerts").hidden = true;
+    $("stamp").textContent = "not updated";
+  }
+}
+
+function setAuto(on) {
+  clearInterval(state.timer);
+  state.timer = on ? setInterval(refresh, REFRESH_MS) : null;
+}
+
+$("refresh").onclick = refresh;
+$("auto").onchange = (e) => setAuto(e.target.checked);
+$("tab-site").onclick = () => showTab("site");
+$("tab-score").onclick = () => showTab("score");
+$("do-score").onclick = doScore;
+$("apikey").value = keyStore.get();
+$("apikey").onchange = (e) => { keyStore.set(e.target.value.trim()); refresh(); };
+$("narrative").onkeydown = (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === "Enter") doScore();
+};
+
+refresh();
+setAuto(true);
+</script>
+</body>
+</html>
