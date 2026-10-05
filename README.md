@@ -22,7 +22,7 @@ report and `GET /sites` returns the site queue.
 A 90-second explainer video and the trained model are attached to the
 [Releases](https://github.com/abhinavtop1G/BARRIER-X_SIH26165/releases) page.
 The story of how we built it, including what failed and where we want to take it
-next, is in [`docs/architecture.md`](docs/architecture.md).
+next, is in [`docs/article.md`](docs/article.md).
 
 ```bash
 pip install -r requirements-serve.txt
