@@ -39,6 +39,7 @@ export interface HealthResponse {
   model_ready:         boolean | null
   auth_enabled:        boolean | null
   rate_limit_per_min:  number | null
+  demo_login:          boolean
 }
 
 export type RiskBand = 'HIGH' | 'ELEVATED' | 'BORDERLINE' | 'LOW'

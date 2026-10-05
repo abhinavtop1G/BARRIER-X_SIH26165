@@ -10,6 +10,7 @@ interface AuthContextValue {
   token:           string | null
   isAuthenticated: boolean
   loginWithGoogle: (credential: string) => Promise<void>
+  loginAsDemo:     () => Promise<void>
   logout:          () => void
 }
 
@@ -32,14 +33,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return sessionStorage.getItem(TOKEN_KEY)
   })
 
-  const loginWithGoogle = useCallback(async (credential: string) => {
+  const startSession = useCallback(async (path: string, body?: unknown) => {
     const base = import.meta.env.VITE_API_URL ?? ''
-    const endpoint = base ? `${base}/api/v1/auth/google` : '/api/v1/auth/google'
+    const endpoint = base ? `${base}${path}` : path
 
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ credential }),
+      body: body === undefined ? undefined : JSON.stringify(body),
     })
 
     if (!res.ok) {
@@ -67,6 +68,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userObj)
   }, [])
 
+  const loginWithGoogle = useCallback(
+    (credential: string) => startSession('/api/v1/auth/google', { credential }),
+    [startSession],
+  )
+
+  const loginAsDemo = useCallback(() => startSession('/api/v1/auth/demo'), [startSession])
+
   const logout = useCallback(() => {
     sessionStorage.removeItem(TOKEN_KEY)
     sessionStorage.removeItem(USER_KEY)
@@ -75,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated: !!user, loginWithGoogle, logout }}>
+    <AuthContext.Provider value={{ user, token, isAuthenticated: !!user, loginWithGoogle, loginAsDemo, logout }}>
       {children}
     </AuthContext.Provider>
   )

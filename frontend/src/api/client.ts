@@ -139,6 +139,7 @@ interface GatewayHealth {
   version?: string
   ml_status?: 'ok' | 'degraded' | 'unreachable'
   ml?: MLHealth | null
+  demo_login?: boolean
 }
 
 export const getHealth = async (): Promise<HealthResponse> => {
@@ -158,6 +159,7 @@ export const getHealth = async (): Promise<HealthResponse> => {
       model_ready: ml.model_ready ?? null,
       auth_enabled: ml.auth_enabled ?? null,
       rate_limit_per_min: ml.rate_limit_per_min ?? null,
+      demo_login: data.demo_login === true,
     }
   } catch {
     return {
@@ -165,6 +167,7 @@ export const getHealth = async (): Promise<HealthResponse> => {
       gateway_service: null,
       gateway_version: null,
       ...UNKNOWN_MODEL,
+      demo_login: false,
     }
   }
 }
