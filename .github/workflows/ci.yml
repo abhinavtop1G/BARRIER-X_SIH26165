@@ -213,6 +213,16 @@ jobs:
           for i in $(seq 1 30); do curl -fsS http://127.0.0.1:9000/health >/dev/null 2>&1 && break; sleep 1; done
           curl -fsS http://127.0.0.1:9000/health | tee /dev/stderr | grep -q '"gateway_status":"ok"'
           curl -fsS http://127.0.0.1:9000/health | grep -q '"ml_status":"unreachable"'
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:9000/api/v1/auth/demo)" = "404"
+
+      - name: Gateway demo login issues a working session
+        run: |
+          docker run -d --name gateway-demo -p 9001:9001 -e PORT=9001 -e DEMO_MODE=true bx-gateway:ci
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:9001/health >/dev/null 2>&1 && break; sleep 1; done
+          curl -fsS http://127.0.0.1:9001/health | grep -q '"demo_login":true'
+          token=$(curl -fsS -X POST http://127.0.0.1:9001/api/v1/auth/demo | python3 -c 'import json,sys; print(json.load(sys.stdin)["token"])')
+          curl -fsS http://127.0.0.1:9001/api/v1/auth/me -H "Authorization: Bearer $token" | tee /dev/stderr | grep -q '"name":"Demo Judge"'
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:9001/api/v1/auth/me -H "Authorization: Bearer ${token}x")" = "401"
 
       - name: Frontend serves the app and deep links
         run: |
@@ -224,8 +234,8 @@ jobs:
       - name: Logs on failure
         if: failure()
         run: |
-          for c in agent gateway frontend; do echo "== $c"; docker logs $c 2>&1 | tail -40 || true; done
+          for c in agent gateway gateway-demo frontend; do echo "== $c"; docker logs $c 2>&1 | tail -40 || true; done
 
       - name: Stop
         if: always()
-        run: docker rm -f agent gateway frontend || true
+        run: docker rm -f agent gateway gateway-demo frontend || true
