@@ -1,13 +1,34 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
 import { useAuth } from '@/context/AuthContext'
+import { getHealth } from '@/api/client'
 
 export default function LoginPage() {
-  const { loginWithGoogle } = useAuth()
+  const { loginWithGoogle, loginAsDemo } = useAuth()
   const navigate            = useNavigate()
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [loading, setLoading]   = useState(false)
+  const [demoAvailable, setDemoAvailable] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    getHealth().then(h => { if (active) setDemoAvailable(h.demo_login) })
+    return () => { active = false }
+  }, [])
+
+  async function onDemo() {
+    setLoading(true)
+    setErrorMsg(null)
+    try {
+      await loginAsDemo()
+      navigate('/dashboard', { replace: true })
+    } catch (err: any) {
+      setErrorMsg(err?.message ?? 'Demo login failed')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
 
@@ -80,7 +101,23 @@ export default function LoginPage() {
             </div>
           )}
 
-          {!googleClientId && (
+          {demoAvailable && (
+            <div className="w-full mb-6">
+              <button
+                type="button"
+                onClick={onDemo}
+                disabled={loading}
+                className="w-full py-3 rounded-lg bg-bx-gold text-black font-semibold text-sm hover:opacity-90 transition disabled:opacity-50"
+              >
+                Continue as demo judge
+              </button>
+              <p className="mt-2 text-[0.7rem] text-bx-muted">
+                Evaluation access without a Google account. Enabled by the gateway's DEMO_MODE setting.
+              </p>
+            </div>
+          )}
+
+          {!googleClientId && !demoAvailable && (
             <div className="w-full mb-6 p-3.5 rounded-lg bg-bx-gold/10 border border-bx-gold/30 text-bx-gold text-xs text-left">
               <span className="font-semibold block mb-0.5">Notice:</span>
               Configure <code className="font-mono bg-black/40 px-1 py-0.5 rounded">VITE_GOOGLE_CLIENT_ID</code> in <code className="font-mono bg-black/40 px-1 py-0.5 rounded">frontend/.env</code> to connect your Google Cloud Console OAuth App.
