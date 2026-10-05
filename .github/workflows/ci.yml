@@ -181,3 +181,51 @@ jobs:
             -H 'Content-Type: application/json' \
             -d '{"narrative":"While rigging down, the worker stood under a suspended load when the sling parted and the load fell to the deck."}' \
             | tee /dev/stderr | grep -q '"band"'
+
+  service-images:
+    name: service images (gateway, agent, frontend)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build gateway
+        run: docker build -t bx-gateway:ci ./gateway
+
+      - name: Build agent
+        run: docker build -t bx-agent:ci ./agent_service
+
+      - name: Build frontend
+        run: docker build -t bx-frontend:ci --build-arg VITE_API_URL=http://localhost:9000 ./frontend
+
+      - name: Agent serves
+        run: |
+          docker run -d --name agent -p 8001:8001 bx-agent:ci
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8001/health >/dev/null 2>&1 && break; sleep 1; done
+          curl -fsS http://127.0.0.1:8001/health | tee /dev/stderr | grep -q '"status":"ok"'
+          curl -fsS -X POST http://127.0.0.1:8001/agent/chat \
+            -H 'Content-Type: application/json' \
+            -d '{"message":"What are the IOGP Life-Saving Rules?"}' \
+            | tee /dev/stderr | grep -q '"answer"'
+
+      - name: Gateway serves and reports the ML service
+        run: |
+          docker run -d --name gateway -p 9000:9000 -e PORT=9000 -e ML_SERVICE_URL=http://127.0.0.1:1 bx-gateway:ci
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:9000/health >/dev/null 2>&1 && break; sleep 1; done
+          curl -fsS http://127.0.0.1:9000/health | tee /dev/stderr | grep -q '"gateway_status":"ok"'
+          curl -fsS http://127.0.0.1:9000/health | grep -q '"ml_status":"unreachable"'
+
+      - name: Frontend serves the app and deep links
+        run: |
+          docker run -d --name frontend -p 5173:5173 bx-frontend:ci
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:5173/ >/dev/null 2>&1 && break; sleep 1; done
+          curl -fsS http://127.0.0.1:5173/ | grep -q 'id="root"'
+          curl -fsS http://127.0.0.1:5173/dashboard/agent | grep -q 'id="root"'
+
+      - name: Logs on failure
+        if: failure()
+        run: |
+          for c in agent gateway frontend; do echo "== $c"; docker logs $c 2>&1 | tail -40 || true; done
+
+      - name: Stop
+        if: always()
+        run: docker rm -f agent gateway frontend || true
