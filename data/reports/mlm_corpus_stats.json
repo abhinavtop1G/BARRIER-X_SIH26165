@@ -1,5 +1,5 @@
 {
-  "output": "C:\\Users\\Abhinav\\Downloads\\OILPS26165\\avertx-clean\\data\\mlm_corpus.txt",
+  "output": "data/mlm_corpus.txt",
   "rows_kept": 589717,
   "skipped_duplicate": 161138,
   "skipped_too_short": 96432,

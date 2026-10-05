@@ -1,6 +1,6 @@
 {
   "base_model": "model_artifacts/deberta-v3-small_adapted",
-  "corpus": "C:\\Users\\Abhinav\\Downloads\\OILPS26165\\avertx-clean\\data\\mlm_corpus.txt",
+  "corpus": "data/mlm_corpus.txt",
   "corpus_lines": 589717,
   "steps": 10000,
   "effective_batch": 32,

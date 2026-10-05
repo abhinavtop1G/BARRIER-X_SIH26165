@@ -1,6 +1,6 @@
 {
-  "init_from": "C:\\Users\\Abhinav\\Downloads\\OILPS26165\\avertx-clean\\model_artifacts\\deberta-v3-small_adapted_15k",
-  "data": "C:\\Users\\Abhinav\\Downloads\\OILPS26165\\avertx-clean\\data\\seed\\phmsa_serious.csv",
+  "init_from": "model_artifacts/deberta-v3-small_adapted_15k",
+  "data": "data/seed/phmsa_serious.csv",
   "train_rows": 69341,
   "validation_rows": 3649,
   "steps": 4332,
