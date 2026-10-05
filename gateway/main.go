@@ -50,16 +50,27 @@ func main() {
 
 	mux := http.NewServeMux()
 
+	healthClient := &http.Client{Timeout: 3 * time.Second}
+
 	healthHandler := func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		mlHealth, mlStatus, mlErr := fetchMLHealth(healthClient, cfg.MLServiceURL)
+
+		body := map[string]interface{}{
 			"status":         "ok",
 			"gateway_status": "ok",
 			"service":        "BARRIER X Go API Gateway",
 			"auth_checking":  "active (enforced Google OAuth)",
 			"port":           cfg.Port,
 			"version":        "1.0.0",
-		})
+			"ml_status":      mlStatus,
+			"ml":             mlHealth,
+		}
+		if mlErr != "" {
+			body["ml_error"] = mlErr
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(body)
 	}
 	mux.HandleFunc("/health", healthHandler)
 	mux.HandleFunc("/api/v1/health", healthHandler)
@@ -302,4 +313,25 @@ func main() {
 	if err := http.ListenAndServe(":"+cfg.Port, handler); err != nil {
 		log.Fatalf("Gateway server error: %v", err)
 	}
+}
+
+func fetchMLHealth(client *http.Client, baseURL string) (map[string]interface{}, string, string) {
+	resp, err := client.Get(strings.TrimRight(baseURL, "/") + "/health")
+	if err != nil {
+		return nil, "unreachable", err.Error()
+	}
+	defer resp.Body.Close()
+
+	var data map[string]interface{}
+	if err := json.NewDecoder(io.LimitReader(resp.Body, 64<<10)).Decode(&data); err != nil {
+		return nil, "unreachable", fmt.Sprintf("invalid health response (HTTP %d): %v", resp.StatusCode, err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return data, "degraded", fmt.Sprintf("ML service returned HTTP %d", resp.StatusCode)
+	}
+	if ready, _ := data["model_ready"].(bool); !ready {
+		return data, "degraded", ""
+	}
+	return data, "ok", ""
 }
