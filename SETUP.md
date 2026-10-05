@@ -86,6 +86,30 @@ keys are not — send those through a password manager, never chat. There is no
 
 ---
 
+## With Docker
+
+All five services (frontend, gateway, ML scoring, HSE agent, MongoDB) run from the
+repo root:
+
+```bash
+docker compose up --build
+```
+
+Compose reads these from a `.env` file next to `docker-compose.yml`:
+
+| variable | used by | notes |
+|---|---|---|
+| `GOOGLE_CLIENT_ID` | frontend (build time), gateway | required for sign-in |
+| `JWT_SECRET` | gateway | if unset, a random key is generated and sessions reset on restart |
+| `GEMINI_API_KEY` / `GROQ_API_KEY` / `OPENAI_API_KEY` | agent | optional; the agent falls back to built-in HSE answers without them |
+
+The frontend is a static build served by nginx. `VITE_*` values are baked in at
+build time, so after changing `GOOGLE_CLIENT_ID`, rebuild with
+`docker compose up --build frontend`. The ML image downloads the model while it
+builds, so the first build takes about 5 minutes.
+
+---
+
 ## The four services
 
 | service | port | started by |
