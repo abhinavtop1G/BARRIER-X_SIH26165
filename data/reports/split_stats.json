@@ -1,0 +1,21 @@
+{
+  "train": {
+    "rows": 231,
+    "yes": 94,
+    "no": 137,
+    "base_rate": 0.4069
+  },
+  "validation": {
+    "rows": 57,
+    "yes": 23,
+    "no": 34,
+    "base_rate": 0.4035
+  },
+  "test": {
+    "rows": 123,
+    "yes": 50,
+    "no": 73,
+    "base_rate": 0.4065
+  },
+  "leakage_free": true
+}
