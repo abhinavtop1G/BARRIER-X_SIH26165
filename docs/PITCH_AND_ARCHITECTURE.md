@@ -46,7 +46,7 @@ Instead of treating all reports equally, BARRIER X uses **fine-tuned Transformer
 |    ML SCORING SERVICE    |               |      AI HSE AGENT SERVICE    |
 |         (:8000)          |               |           (:8001)            |
 |  • DeBERTa-v3 Transformer|               |  • Gemini 2.5 Flash / Groq   |
-|  • Isotonic Calibration  |               |  • Dynamic RAG Vector Memory |
+|  • Platt Calibration     |               |  • Dynamic RAG Vector Memory |
 |  • Risk Band Classifier  |               |  • IOGP 9 Life-Saving Rules  |
 |  • Action Guidance Engine|               |  • Out-of-Context HSE Engine |
 +--------------------------+               +------------------------------+
@@ -66,7 +66,7 @@ Instead of treating all reports equally, BARRIER X uses **fine-tuned Transformer
 ## 3. The 4 Core Technical Pillars
 
 ### Pillar 1: Calibrated NLP SIF Scoring Engine
-* **Model**: Domain-adapted `deberta-v3-small-sif` transformer with an **Isotonic Calibration Layer**.
+* **Model**: Domain-adapted `deberta-v3-small-sif` transformer with **Platt-scaling calibration** fitted on the validation split.
 * **Input**: Free-text narrative (e.g., *"During pump P-204 maintenance, isolation valve was not tagged out; residual pressure escaped"*).
 * **Output**:
   * **SIF Probability**: Continuous mathematical score ($0.00$ to $1.00$).
