@@ -58,7 +58,7 @@ Timestamps are the measured beat boundaries in the rendered video.
 
 ## 0:42 – 0:51 · 04 / INSIDE /score
 
-**On screen:** Hinglish normalise → word tokens fly into DeBERTa → isotonic calibration curve → pointer lands on the 4-band meter → rules / audit / site-history chips.
+**On screen:** Hinglish normalise → word tokens fly into DeBERTa → Platt calibration curve → pointer lands on the 4-band meter → rules / audit / site-history chips.
 **VO:**
 > Inside, Hinglish is normalised, DeBERTa reads the narrative in forty-six milliseconds on a CPU, and calibration maps it to one of four risk bands. Not a yes or no.
 

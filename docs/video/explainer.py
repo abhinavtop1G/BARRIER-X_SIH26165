@@ -380,10 +380,8 @@ class RepoExplainer(Scene):
 
         ax = Axes(x_range=[0, 1, 1], y_range=[0, 1, 1], x_length=2.2, y_length=2.0, tips=False,
                   axis_config={"color": SLATE, "include_ticks": False}).move_to([1.2, -0.3, 0])
-        steps = [(0, 0.05), (0.25, 0.05), (0.25, 0.2), (0.45, 0.2), (0.45, 0.42), (0.6, 0.42),
-                 (0.6, 0.7), (0.8, 0.7), (0.8, 0.92), (1, 0.92)]
-        curve = VMobject(color=VIOLET, stroke_width=4).set_points_as_corners([ax.c2p(a, b) for a, b in steps])
-        ax_l = T("isotonic calibration", 15, VIOLET, font=MONO).next_to(ax, UP, buff=0.12)
+        curve = ax.plot(lambda x: 1 / (1 + np.exp(-9 * (x - 0.5))), x_range=[0, 1], color=VIOLET, stroke_width=4)
+        ax_l = T("Platt calibration", 15, VIOLET, font=MONO).next_to(ax, UP, buff=0.12)
 
         mx, y0, y1 = 4.4, -1.9, 1.5
         thr = 0.42
