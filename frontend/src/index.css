@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: #0a0a0a;
+    color: #F8F8F8;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: #0a0a0a; }
+  ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+
+  @font-face { font-display: swap; }
+}
+
+@layer components {
+  .btn-gold {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-sm
+           bg-bx-gold text-bx-bg transition-all duration-200
+           hover:bg-bx-gold-dim hover:-translate-y-px
+           hover:shadow-[0_4px_24px_rgba(212,175,55,0.2)]
+           active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-sm
+           border border-bx-border text-bx-secondary transition-all duration-200
+           hover:border-bx-subtle hover:text-bx-text hover:bg-bx-card;
+  }
+  .card {
+    @apply bg-bx-card border border-bx-border rounded-xl p-6
+           transition-colors duration-200 hover:bg-bx-hover hover:border-bx-subtle;
+  }
+  .mono-label {
+    @apply font-mono text-[0.65rem] uppercase tracking-widest text-bx-muted;
+  }
+  .section-label {
+    @apply font-mono text-[0.65rem] uppercase tracking-widest text-bx-gold mb-4;
+  }
+  .badge-high      { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.65rem] font-semibold uppercase tracking-wide bg-amber-500/10 text-amber-400 border border-amber-500/25; }
+  .badge-elevated  { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.65rem] font-semibold uppercase tracking-wide bg-bx-gold/10 text-bx-gold border border-bx-gold/20; }
+  .badge-borderline{ @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.65rem] font-semibold uppercase tracking-wide bg-zinc-800/40 text-zinc-400 border border-zinc-700/30; }
+  .badge-low       { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.65rem] font-semibold uppercase tracking-wide bg-zinc-800/60 text-zinc-300 border border-zinc-700/40; }
+  .badge-soon      { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.65rem] font-semibold uppercase tracking-wide bg-white/5 text-bx-muted border border-bx-border; }
+}
