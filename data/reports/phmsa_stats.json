@@ -1,0 +1,15 @@
+{
+  "files": 655,
+  "rows_raw": 678309,
+  "rows_long_enough": 555767,
+  "rows_labelled": 555767,
+  "rows_deduplicated": 395481,
+  "rows_held_out_removed": 0,
+  "rows_written": 72990,
+  "positives_written": 14598,
+  "base_rate_written": 0.2,
+  "base_rate_full": 0.0369,
+  "neg_ratio": 4.0,
+  "mean_chars": 386,
+  "validation_rows": 3649
+}
