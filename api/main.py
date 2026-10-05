@@ -75,6 +75,8 @@ async def lifespan(app: FastAPI):
                       level=logging.WARNING, event="startup_warning")
     except Exception as exc:
         STATE["backend"] = f"FAILED: {exc}"
+        if os.getenv("SIF_THRESHOLD"):
+            STATE["threshold"] = float(os.environ["SIF_THRESHOLD"])
         audit.log(audit.ACCESS, "model failed to load", level=logging.ERROR,
                   event="startup_failure", error=f"{type(exc).__name__}: {exc}")
     yield
