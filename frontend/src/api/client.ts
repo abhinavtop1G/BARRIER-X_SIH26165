@@ -121,14 +121,43 @@ const UNKNOWN_MODEL = {
   rate_limit_per_min: null,
 } as const
 
+interface MLHealth {
+  model_backend?: string
+  model?: string
+  model_fingerprint?: string
+  calibration?: string
+  default_threshold?: number
+  band_margin?: number
+  model_ready?: boolean
+  auth_enabled?: boolean
+  rate_limit_per_min?: number
+}
+
+interface GatewayHealth {
+  gateway_status?: string
+  service?: string
+  version?: string
+  ml_status?: 'ok' | 'degraded' | 'unreachable'
+  ml?: MLHealth | null
+}
+
 export const getHealth = async (): Promise<HealthResponse> => {
   try {
-    const data = await request<{ gateway_status?: string; service?: string; version?: string }>('/health')
+    const data = await request<GatewayHealth>('/health')
+    const ml = data.ml ?? {}
     return {
-      status: data.gateway_status === 'ok' ? 'ok' : 'degraded',
+      status: data.gateway_status === 'ok' && data.ml_status === 'ok' ? 'ok' : 'degraded',
       gateway_service: data.service ?? null,
       gateway_version: data.version ?? null,
-      ...UNKNOWN_MODEL,
+      model_backend: ml.model_backend ?? null,
+      model: ml.model ?? null,
+      model_fingerprint: ml.model_fingerprint ?? null,
+      calibration: ml.calibration ?? null,
+      default_threshold: ml.default_threshold ?? null,
+      band_margin: ml.band_margin ?? null,
+      model_ready: ml.model_ready ?? null,
+      auth_enabled: ml.auth_enabled ?? null,
+      rate_limit_per_min: ml.rate_limit_per_min ?? null,
     }
   } catch {
     return {
